@@ -55,16 +55,15 @@ class ItemsController < ApplicationController
     @item = Item.new(item_params)
     @item.user = current_user
 
-    if @item.image
-      # Do nothing if an image is already uploaded
-    else
-      response = openai.Image.create(
-        prompt="#{@item.title}",
-        n=1,
-        size="256x256",
-        api_key=ENV['OPENAI_API_KEY']
+    if @item.image.blank?
+      openAIClient = OpenAI::Client.new
+      response = openAIClient.images.generate(
+        parameters: {
+          prompt: @item.title,
+          size: "256x256"
+        }
       )
-      @item.image = response['data'][0]['url']
+      @item.image = response.dig("data", 0, "url")
     end
 
     if @item.save
