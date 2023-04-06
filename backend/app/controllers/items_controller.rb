@@ -54,6 +54,18 @@ class ItemsController < ApplicationController
     @item = Item.new(item_params)
     @item.user = current_user
 
+    if @item.image
+      # Do nothing if an image is already uploaded
+    else
+      response = openai.Image.create(
+        prompt="#{@item.title}",
+        n=1,
+        size="256x256",
+        api_key=ENV['OPENAI_API_KEY']
+      )
+      @item.image = response['data'][0]['url']
+    end
+
     if @item.save
       sendEvent("item_created", { item: item_params })
       render :show
