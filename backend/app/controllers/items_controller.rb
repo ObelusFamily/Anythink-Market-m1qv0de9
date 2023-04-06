@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require_relative "../../lib/event"
+require "ruby/openai"
 include Event
 
 class ItemsController < ApplicationController
